@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 
 // Postgres Client Setup
 const { Pool } = require('pg');
-
 const pgClient = new Pool({
   user: keys.pgUser,
   host: keys.pgHost,
@@ -27,7 +26,6 @@ pgClient
 
 // Redis Client Setup
 const redis = require('redis');
-console.log(keys.redisHost, keys.redisPort, )
 const redisClient = redis.createClient({
   host: keys.redisHost,
   port: keys.redisPort,
@@ -49,7 +47,6 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
   redisClient.hgetall('values', (err, values) => {
-    console.log(values);
     res.send(values);
   });
 });

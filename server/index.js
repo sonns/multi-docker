@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 
 // Postgres Client Setup
 const { Pool } = require('pg');
+
 const pgClient = new Pool({
   user: keys.pgUser,
   host: keys.pgHost,
@@ -26,6 +27,7 @@ pgClient
 
 // Redis Client Setup
 const redis = require('redis');
+console.log(keys.redisHost, keys.redisPort, )
 const redisClient = redis.createClient({
   host: keys.redisHost,
   port: keys.redisPort,
@@ -47,6 +49,7 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
   redisClient.hgetall('values', (err, values) => {
+    console.log(values);
     res.send(values);
   });
 });
@@ -61,8 +64,10 @@ app.post('/values', async (req, res) => {
   redisClient.hset('values', index, 'Nothing yet!');
   redisPublisher.publish('insert', index);
   pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
+  redisClient.hgetall('values', (err, values) => {
+    res.send({ working: true, value: values });
+  });
 
-  res.send({ working: true });
 });
 
 app.listen(5000, err => {
